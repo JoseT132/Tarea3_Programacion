@@ -2,13 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
-package tarea3_progra2;
+package tarea3_programacion;
 
 /**
  *
  * @author josed
  */
-public class Tarea3_Progra2 {
+public class Tarea3_Programacion {
 
     /**
      * @param args the command line arguments
