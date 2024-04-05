@@ -58,6 +58,7 @@ public class Tarea3_Programacion {
                     System.out.println();
                     break;
                 case 5:
+                    System.out.println("Saliendo del programa");
                     valido = true;
                     break;
                 default:
