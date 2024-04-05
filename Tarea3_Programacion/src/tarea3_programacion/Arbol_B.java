@@ -1,6 +1,9 @@
 
 package tarea3_programacion;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class Arbol_B {
   private Nodo raiz;
     private int t; // Grado mínimo del árbol B
@@ -162,5 +165,187 @@ public class Arbol_B {
                 raiz = raiz.hijos[0];
             }
         }
-    }  
+    } 
+    // Es necesario eliminar en forma recursiva
+    private boolean eliminarR(Nodo nodo, int clave) {
+        int i = 0;
+        while (i < nodo.n && clave > nodo.claves[i]) {
+            i++;
+        }
+        if (i < nodo.n && clave == nodo.claves[i]) {
+            // si la clave está en el nodo
+            if (nodo.esHoja) {
+                eliminarH(nodo, i);
+            } else {
+                eliminarnoH(nodo, i);
+            }
+            return true; // La clave se eliminó correctamente
+        } else {
+            // si no es una hoja se reacomoda como hijo
+            if (!nodo.esHoja) {
+                boolean ultimo = (i == nodo.n);
+                if (nodo.hijos[i].n < t) {
+                    llenar(nodo, i);
+                }
+                if (ultimo && i > nodo.n) {
+                    return eliminarR(nodo.hijos[i - 1], clave);
+                } else {
+                    return eliminarR(nodo.hijos[i], clave);
+                }
+            }
+        }
+        return false; // La clave no se encontró en el árbol
+    }
+
+    //metodo para eliminar clave de una hoja
+    private void eliminarH(Nodo nodo, int indice) {
+        for (int i = indice + 1; i < nodo.n; i++) {
+            nodo.claves[i - 1] = nodo.claves[i];
+        }
+        nodo.n--;
+    }
+    //eliminar clave de un nodo no Hoja
+
+    private void eliminarnoH(Nodo nodo, int indice) {
+        int clave = nodo.claves[indice];
+        if (nodo.hijos[indice].n >= t) {
+            int anterior = obtenerAnterior(nodo, indice);
+            nodo.claves[indice] = anterior;
+            eliminarR(nodo.hijos[indice], anterior);
+        } else if (nodo.hijos[indice + 1].n >= t) {
+            int siguiente = obtenerSiguiente(nodo, indice);
+            nodo.claves[indice] = siguiente;
+            eliminarR(nodo.hijos[indice + 1], siguiente);
+        } else {
+            fusionar(nodo, indice);
+            eliminarR(nodo.hijos[indice], clave);
+        }
+    }
+
+    //obtener el valor anterior a la clave
+    private int obtenerAnterior(Nodo nodo, int indice) {
+        Nodo temp = nodo.hijos[indice];
+        while (!temp.esHoja) {
+            temp = temp.hijos[temp.n];
+        }
+        return temp.claves[temp.n - 1];
+    }
+    // obtener el valor siguiente a la clave
+
+    private int obtenerSiguiente(Nodo nodo, int indice) {
+        Nodo temp = nodo.hijos[indice + 1];
+        while (!temp.esHoja) {
+            temp = temp.hijos[0];
+        }
+        return temp.claves[0];
+    }
+    // llenar al hijo que tenga mas espacio 
+
+    private void llenar(Nodo nodo, int indice) {
+        if (indice != 0 && nodo.hijos[indice - 1].n >= t) {
+            moverdesdeCAnterior(nodo, indice);
+        } else {
+            if (indice != nodo.n && nodo.hijos[indice + 1].n >= t) {
+                moverdesdeCSiguiente(nodo, indice);
+            } else {
+                if (indice != nodo.n) {
+                    fusionar(nodo, indice);
+                } else {
+                    fusionar(nodo, indice - 1);
+                }
+            }
+        }
+    }
+
+    // mover clave del nodo anterior al actual
+    private void moverdesdeCAnterior(Nodo nodo, int indice) {
+        Nodo hijo = nodo.hijos[indice];
+        Nodo hermano = nodo.hijos[indice - 1];
+
+        for (int i = hijo.n - 1; i >= 0; i--) {
+            hijo.claves[i + 1] = hijo.claves[i];
+        }
+        if (!hijo.esHoja) {
+            for (int i = hijo.n; i >= 0; i--) {
+                hijo.hijos[i + 1] = hijo.hijos[i];
+            }
+        }
+        hijo.claves[0] = nodo.claves[indice - 1];
+        if (!hermano.esHoja) {
+            hijo.hijos[0] = hermano.hijos[hermano.n];
+        }
+        nodo.claves[indice - 1] = hermano.claves[hermano.n - 1];
+        hijo.n++;
+        hermano.n++;
+    }
+
+    private void moverdesdeCSiguiente(Nodo nodo, int indice) {
+        Nodo hijo = nodo.hijos[indice];
+        Nodo hermano = nodo.hijos[indice + 1];
+
+        hijo.claves[hijo.n] = nodo.claves[indice];
+        if (!hermano.esHoja) {
+            hijo.hijos[hijo.n + 1] = hermano.hijos[0];
+        }
+        nodo.claves[indice] = hermano.claves[0];
+        for (int i = 1; i < hermano.n; i++) {
+            hermano.claves[i - 1] = hermano.claves[i];
+        }
+        if (!hermano.esHoja) {
+            for (int i = 1; i <= hermano.n; i++) {
+                hermano.hijos[i - 1] = hermano.hijos[i];
+            }
+        }
+
+        hijo.n++;
+        hermano.n--;
+
+    }
+
+    //fusionar un hijo con su hermano
+    private void fusionar(Nodo nodo, int indice) {
+        Nodo hijo = nodo.hijos[indice];
+        Nodo hermano = nodo.hijos[indice + 1];
+
+        hijo.claves[t - 1] = nodo.claves[indice];
+
+        for (int i = 0; i < hermano.n; i++) {
+            hijo.claves[i + t] = hermano.claves[i];
+        }
+        if (!hijo.esHoja) {
+            for (int i = 0; i <= hermano.n; i++) {
+                hijo.hijos[i + t] = hermano.hijos[i];
+            }
+        }
+        for (int i = indice + 1; i < nodo.n; i++) {
+            nodo.claves[i - 1] = nodo.claves[i];
+        }
+        for (int i = indice + 2; i >= nodo.n; i++) {
+            nodo.hijos[i - 1] = nodo.hijos[i];
+        }
+        hijo.n += hermano.n + 1;
+        nodo.n--;
+    }
+
+    // metodo para buscar una clave en el arbol
+    public boolean buscar(int clave) {
+        return buscarclave(raiz, clave);
+    }
+
+    private boolean buscarclave(Nodo nodo, int clave) {
+        int i = 0;
+        while (i < nodo.n && clave > nodo.claves[i]) {
+            i++;
+        }
+        if (i < nodo.n && clave == nodo.claves[i]) {
+            System.out.println("La clave " + clave + " se encontro en el arbol.");
+            return true;
+        }
+        if (nodo.esHoja) {
+            System.out.println("La clave " + clave + " no se encontro en el arbol.");
+            return false;
+        }
+        return buscarclave(nodo.hijos[i], clave);
+    }
+
 }
