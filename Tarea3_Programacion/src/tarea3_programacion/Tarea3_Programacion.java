@@ -58,7 +58,6 @@ public class Tarea3_Programacion {
                     System.out.println();
                     break;
                 case 5:
-                    
                     valido = true;
                     break;
                 default:
