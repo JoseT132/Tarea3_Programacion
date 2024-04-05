@@ -1,4 +1,4 @@
-package tarea_3_progra;
+package tarea3_programacion;
 
 public class Nodo {
 
